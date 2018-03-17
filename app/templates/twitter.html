@@ -1,0 +1,7 @@
+{% block twitter %}
+    <ul class="list-group">
+    {% for tweet in messages %}
+    <li class="list-group-item">{{ tweet }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

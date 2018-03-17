@@ -6,3 +6,4 @@ markupsafe
 pip
 werkzeug
 flask-bootstrap
+TwitterAPI
