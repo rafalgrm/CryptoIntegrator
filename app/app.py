@@ -1,12 +1,14 @@
+import json
 import os
 import sqlite3
+from urllib import request
 
-from flask import Flask, g, render_template
+import requests
+from flask import Flask, g, render_template, jsonify, url_for
 from flask_bootstrap import Bootstrap
 
-from twitter.streamer import TwitterStreamer
-from twitter.twitter_api_client import TwitterAPIClient
-from twitter.twitter_filter import TwitterFilter
+from twitter.get_tweets import get_tweets
+
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -25,17 +27,13 @@ app.config.from_pyfile('config.py')
 @app.route('/')
 @app.route('/index')
 def index():
-    # TODO temporary to show tweets on main panel
-    api = TwitterAPIClient(app.config['CONSUMER_KEY'], app.config['CONSUMER_SECRET'],
-                           app.config['ACCESS_TOKEN_KEY'], app.config['ACCESS_TOKEN_SECRET'])
-    filter = TwitterFilter(['bitcoin']).get_filter()
-    streamer = TwitterStreamer(api, filter, limit=8)
-    result = []
-    for text in streamer:
-        if 'text' in text:
-            result.append(text['text'])
-            print(text['text'])
+    result = get_tweets(app, 10)
     return render_template('index.html', messages=result)
+
+
+@app.route('/tweets')
+def get_tweets_endp():
+    return jsonify({'tweet_texts': get_tweets(app, 10)})
 
 
 @app.teardown_appcontext

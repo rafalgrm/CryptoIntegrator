@@ -1,7 +1,10 @@
 {% block twitter %}
+    <span class="label label-primary">Real-time Tweets</span>
     <ul class="list-group">
     {% for tweet in messages %}
-    <li class="list-group-item">{{ tweet }}</li>
+    <li class="list-group-item">{{ tweet.text }}
+    <small>{{ tweet.created_at }}</small>
+    </li>
     {% endfor %}
     </ul>
 {% endblock %}
