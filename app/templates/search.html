@@ -1,0 +1,13 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Search results{% endblock %}
+
+{% block content %}
+<h1>Search results for <em>{{ query }}</em>: </h1>
+<ul class="list-group">
+{% for tweet in result %}
+<li class="list-group-item">{{ tweet.text }}
+<small>{{ tweet.created_at }}</small>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}

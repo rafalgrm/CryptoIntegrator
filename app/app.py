@@ -1,14 +1,13 @@
-import json
+import csv
 import os
 import sqlite3
-from urllib import request
 
-import requests
-from flask import Flask, g, render_template, jsonify, url_for
+from io import StringIO
+from flask import Flask, g, render_template, jsonify, url_for, make_response
 from flask_bootstrap import Bootstrap
 
-from twitter.get_tweets import get_tweets
-
+from tools.twitter_scrape import clean_tweet
+from twitter.get_tweets import get_tweets, search_tweets
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -34,6 +33,24 @@ def index():
 @app.route('/tweets')
 def get_tweets_endp():
     return jsonify({'tweet_texts': get_tweets(app, 10)})
+
+
+@app.route('/search/<query>')
+def search_endp(query):
+    result = search_tweets(app, query)
+    return render_template('search.html', result=result, query=query)
+
+
+@app.route('/download/search/<query>')
+def download_search_endp(query): # TODO move to separate place, add header to CSV
+    result = search_tweets(app, query)
+    io = StringIO()
+    csv_writer = csv.writer(io)
+    csv_writer.writerows([[clean_tweet(tweet['text'].replace('\n', '').replace('\r', '')), tweet['created_at']] for tweet in result])
+    output = make_response(io.getvalue())
+    output.headers['Content-Disposition'] = 'attachment; filename=tweets.csv'
+    output.headers['Content-type'] = 'text/csv'
+    return output
 
 
 @app.teardown_appcontext

@@ -7,3 +7,4 @@ pip
 werkzeug
 flask-bootstrap
 TwitterAPI
+nltk
