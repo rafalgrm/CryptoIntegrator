@@ -3,7 +3,7 @@ import os
 import sqlite3
 
 from io import StringIO
-from flask import Flask, g, render_template, jsonify, url_for, make_response
+from flask import Flask, g, render_template, jsonify, make_response, request, redirect, url_for
 from flask_bootstrap import Bootstrap
 
 from tools.twitter_scrape import clean_tweet
@@ -51,6 +51,24 @@ def download_search_endp(query): # TODO move to separate place, add header to CS
     output.headers['Content-Disposition'] = 'attachment; filename=tweets.csv'
     output.headers['Content-type'] = 'text/csv'
     return output
+
+
+@app.route('/admin')
+def admin():
+    db = get_db()
+    cur = db.execute('select name, abbreviation, enabled from cryptocurrencies join enabled on crypto_id=id order by id')
+    assets = cur.fetchall()
+    return render_template('admin.html', assets=assets)
+
+
+@app.route('/save-admin')
+def save_admin():
+    db = get_db()
+    cur = db.execute('select name, enabled, enabled_id from cryptocurrencies join enabled on crypto_id=id order by id')
+    for c in cur:
+        db.execute('update enabled set enabled = {} where enabled_id = {}'.format(1 if request.args.get(c[0],) == 'true' else 0, c[2]))
+    db.commit()
+    return redirect(url_for('admin'))
 
 
 @app.teardown_appcontext
