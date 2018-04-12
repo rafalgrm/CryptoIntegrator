@@ -7,7 +7,7 @@ from sentiment.bayes_classifier import BayesClassifier
 class TestBayesClassifier(unittest.TestCase):
 
     def setUp(self):
-        self.classfier = BayesClassifier('../classifier_data/training.1600000.processed.noemoticon.csv')
+        self.classfier = BayesClassifier('../classifier_data/training_longer.csv')
 
     def test_predictions(self):
         good = 0
