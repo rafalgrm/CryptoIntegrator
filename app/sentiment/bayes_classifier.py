@@ -1,4 +1,5 @@
 import csv
+import operator
 from collections import Counter
 
 import nltk
@@ -9,11 +10,19 @@ from sentiment.tweet_preprocessor import TweetPreprocessor
 WORD_THRESHOLD = 3
 
 
+def save_word_frequencies(filename, all_words_counts):
+    with open(filename, 'w', encoding="windows-1252") as word_freq_file:
+        sorted_all_words = sorted(all_words_counts, key=all_words_counts.get, reverse=True)
+        for wordvalue in sorted_all_words:
+            if all_words_counts[wordvalue] > WORD_THRESHOLD:
+                word_freq_file.write("{}:{}\n".format(wordvalue, all_words_counts[wordvalue]))
+
+
 class BayesClassifier:
 
     def __init__(self, classifier_data_filename):
         self.processor = TweetPreprocessor()
-        self.all_words = set()  # TODO change it to only include words that have at least n occurrences in training data
+        self.all_words = set()
         self.load_all_words_doc(classifier_data_filename)
 
     def load_all_words_doc(self, classifier_filename):
@@ -26,6 +35,10 @@ class BayesClassifier:
                 all_words_list.extend(text)
                 to_classify_list.append((text, int(row[0])))
         all_words_counts = Counter(all_words_list)
+
+        # saving word frequencies file
+        save_word_frequencies('word_frequencies_v1.rxt', all_words_counts)
+
         self.all_words.update([word for word in all_words_counts if all_words_counts[word]>WORD_THRESHOLD])
         self.train_model(to_classify_list)
 
