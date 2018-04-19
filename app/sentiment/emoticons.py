@@ -1,5 +1,5 @@
 emoticons_sentiment = {'EMOT_SMILE':[':)', ':-)', '(:', '(-:', ';)'],
-                       'EMOT_LAUGH':[':D', ':-D', ';D', 'XD', 'xd', 'xD'],
+                       'EMOT_LAUGH':[':D', ':-D', ';D', 'XD', 'xd', 'xD', ':d', 'Xd'],
                        'EMOT_LOVE':['<3', ':*', ';*'],
                        'EMOT_SADNESS':[':(', ';(', ':-(', ';-(']}
 

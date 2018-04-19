@@ -1,5 +1,4 @@
 import csv
-import operator
 from collections import Counter
 
 import nltk
@@ -18,11 +17,18 @@ def save_word_frequencies(filename, all_words_counts):
                 word_freq_file.write("{}:{}\n".format(wordvalue, all_words_counts[wordvalue]))
 
 
+def save_list(filename, count_list):
+    with open(filename, 'w') as count_file:
+        for num in count_list:
+            count_file.write("{}\n".format(num))
+
+
 class BayesClassifier:
 
     def __init__(self, classifier_data_filename):
         self.processor = TweetPreprocessor()
         self.all_words = set()
+        self.all_words_count = []
         self.load_all_words_doc(classifier_data_filename)
 
     def load_all_words_doc(self, classifier_filename):
@@ -33,11 +39,14 @@ class BayesClassifier:
             for row in reader:
                 text = self.processor.stem_tweet(self.processor.tokenize_tweet(row[5]))
                 all_words_list.extend(text)
+                self.all_words.update(text)
+                self.all_words_count.append(len(self.all_words))
                 to_classify_list.append((text, int(row[0])))
         all_words_counts = Counter(all_words_list)
 
-        # saving word frequencies file
+        # saving word frequencies file TODO move it to some Stats object for this classifier
         save_word_frequencies('word_frequencies_v1.rxt', all_words_counts)
+        save_list('word_completness.txt', self.all_words_count)
 
         self.all_words.update([word for word in all_words_counts if all_words_counts[word]>WORD_THRESHOLD])
         self.train_model(to_classify_list)
