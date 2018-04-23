@@ -52,7 +52,7 @@ class TweetPreprocessor:
                 token_processed = emoticons_map[word]
             elif word.isdigit():
                 token_processed = 'DIGIT'
-            if word not in self.english_stopwords and word not in string.punctuation:
+            if word not in self.english_stopwords and word not in string.punctuation and word not in ['\n', '\r']:
                 token_processed = token_processed.lower()
                 if prev:
                     word_a, word_b = negation_handler(prev, word)

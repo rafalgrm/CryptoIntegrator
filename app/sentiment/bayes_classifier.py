@@ -3,10 +3,16 @@ from collections import Counter
 
 import nltk
 import pickle
+from sklearn.feature_extraction import DictVectorizer
+import numpy as np
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
 
 from sentiment.tweet_preprocessor import TweetPreprocessor
+from tools.classifier_stats import ClassifierStats
 
-WORD_THRESHOLD = 3
+WORD_THRESHOLD = 4
 
 
 def save_word_frequencies(filename, all_words_counts):
@@ -34,10 +40,10 @@ class BayesClassifier:
     def load_all_words_doc(self, classifier_filename):
         all_words_list = []
         to_classify_list = []
-        with open(classifier_filename, encoding="windows-1252") as csvfile:
+        with open(classifier_filename, encoding="windows-1252", errors='ignore') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
-                text = self.processor.stem_tweet(self.processor.tokenize_tweet(row[5]))
+                text = row[1:]
                 all_words_list.extend(text)
                 self.all_words.update(text)
                 self.all_words_count.append(len(self.all_words))
@@ -53,13 +59,11 @@ class BayesClassifier:
 
     def train_model(self, to_classify_list):
         train_items = []
-        for row in to_classify_list:
-            is_positive = 'pos' if row[1] == 4 or row[1] == 3 else 'neg' if row[1] == 1 or row[1] == 0 else 'neu'
-            train_item_tmp = {word: False for word in self.all_words}
-            train_item_tmp.update({word: True for word in row[0]})
-            train_item = (train_item_tmp, is_positive)
-            train_items.append(train_item)
-        self.classifier = nltk.NaiveBayesClassifier.train(train_items)
+        self.vectorizer = CountVectorizer()
+        X = self.vectorizer.fit_transform(list(map(lambda l: ' '.join(l[0]), to_classify_list)))
+        y = np.array(['pos' if row[1] == 4 or row[1] == 3 else 'neg' if row[1] == 1 or row[1] == 0 else 'neu' for row in to_classify_list])
+        print(len(self.vectorizer.get_feature_names()))
+        self.classifier = MultinomialNB().fit(X, y)
 
         # saving classifier for later testing
         f = open('niavebayes_classifier.pickle', 'wb')
@@ -67,5 +71,5 @@ class BayesClassifier:
         f.close()
 
     def predict(self, text):
-        to_classify = {word: (word in self.processor.stem_tweet(self.processor.tokenize_tweet(text))) for word in self.all_words}
-        return self.classifier.classify(to_classify)
+        X = self.vectorizer.transform([' '.join(text)])
+        return self.classifier.predict(X)
