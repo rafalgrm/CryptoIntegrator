@@ -1,0 +1,35 @@
+{% extends "bootstrap/base.html" %} 
+{% block title %}Average prices{% endblock %}
+{% block content %}
+
+<h1>Average coin prices</h1>
+<table class="table table-hover table-condensed">
+    <tr>
+        <th>Coin name</th>
+        <th>Price1 [USD]</th>
+        <th>Price2 [USD]</th>
+        <th>Price1 [EUR]</th>
+        <th>Price2 [EUR]</th>
+        <th>Avereage [USD]</th>
+        <th>Avereage [EUR]</th>
+    </tr>
+    {% for coin in result %}
+    <tr>
+        <td>{{ coin.name }} [{{ coin.symbol }}]</td>
+        <td>{{ coin.price_usd1 }}</td>
+        <td>{{ coin.price_usd2 }}</td>
+        <td>{{ coin.price_eur1 }}</td>
+        <td>{{ coin.price_eur2 }}</td>
+        <td>{{ coin.average_usd }}</td>
+        <td>{{ coin.average_eur }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<!-- <ul class="list-group">
+{% for coin in result %}
+<li class="list-group-item">{{ coin.name }}
+<small>{{ coin.price }}</small>
+</li>
+{% endfor %} -->
+</ul>
+{% endblock %}

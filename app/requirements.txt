@@ -9,3 +9,4 @@ flask-bootstrap
 TwitterAPI
 nltk
 matplotlib
+requests
