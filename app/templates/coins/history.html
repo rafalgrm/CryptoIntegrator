@@ -3,55 +3,62 @@
 {% block content %}
 <h1>Flask Chart.js</h1>
 <canvas id="chart" width="600" height="400"></canvas>
-<script src='../static/Chart.min.js'></script>
+<script src='../../static/Chart.min.js'></script>
 <script>
-   // bar chart data
-   var barData = {
-   labels : [{% for item in labels %}
-                  "{{item}}",
-              {% endfor %}],
-   datasets : [
-      {
-            fillColor: "rgba(151,187,205,0.2)",
-            strokeColor: "rgba(151,187,205,1)",
-            pointColor: "rgba(151,187,205,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(151,187,205,1)",
-            bezierCurve : false,
-            data : [{% for item in values %}
-                      {{item}},
-                    {% endfor %}]
-      }]
-   }
- 
-    Chart.defaults.global.animationSteps = 50;
-    Chart.defaults.global.tooltipYPadding = 16;
-    Chart.defaults.global.tooltipCornerRadius = 0;
-    Chart.defaults.global.tooltipTitleFontStyle = "normal";
-    Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
-    Chart.defaults.global.animationEasing = "easeOutBounce";
-    Chart.defaults.global.responsive = false;
-    Chart.defaults.global.scaleLineColor = "black";
-    Chart.defaults.global.scaleFontSize = 16;
- 
-   // get bar chart canvas
-   var mychart = document.getElementById("chart").getContext("2d");
- 
-   steps = 10
-   max = 10
-   // draw bar chart
-   var LineChartDemo = new Chart(mychart).Line(barData, {
-        scaleOverride: true,
-        scaleSteps: steps,
-        scaleStepWidth: Math.ceil(max / steps),
-        scaleStartValue: 0,
-        scaleShowVerticalLines: true,
-        scaleShowGridLines : true,
-        barShowStroke : true,
-        scaleShowLabels: true,
-        bezierCurve: false,
- 
-   });
+    var config = {
+        type: 'line',
+        data: {
+            labels : [{% for item in labels %}"{{item}}",{% endfor %}],
+            datasets : [{
+                label: 'USD',
+                fill: false,
+                backgroundColor: '#f44242',
+                borderColor: '#f44242',
+                data : [{% for item in values_usd %}{{item}},{% endfor %}]
+            }, {
+                label: 'EUR',
+                fill: false,
+                backgroundColor: '#424ef4',
+                borderColor: '#424ef4',
+                data : [{% for item in values_eur %}{{item}},{% endfor %}]
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'BTC prices in 2017'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Month'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value'
+                    }
+                }]
+            }
+        }
+    };
+
+    window.onload = function() {
+        var ctx = document.getElementById('chart').getContext('2d');
+        window.myLine = new Chart(ctx, config);
+    };
 </script>
 {% endblock %}

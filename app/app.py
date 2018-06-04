@@ -10,7 +10,7 @@ from tools.twitter_scrape import clean_tweet
 from twitter.get_tweets import get_tweets, search_tweets
 
 from coins.aggregate_prices import get_average_prices
-from coins.get_prices_history import get_prices_history
+from coins.get_prices_history import get_prices_history_monthly
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -61,10 +61,10 @@ def display_average_prices():
     return render_template('coins/average.html', result=get_average_prices())
 
 
-@app.route('/prices/history')
+@app.route('/prices/history/monthly')
 def display_prices_history():
-    data = get_prices_history();
-    return render_template('coins/history.html', values=data['values'], labels=data['labels'])
+    data = get_prices_history_monthly()
+    return render_template('coins/history.html', values_usd=data['values_usd'], values_eur=data['values_eur'], labels=data['labels'])
 
 
 @app.route('/admin')
