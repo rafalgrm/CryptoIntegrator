@@ -34,7 +34,7 @@ def get_prices_history_monthly(coin_symbol):
         values_usd.append(cryptocompare_response[coin_symbol]['USD'])
         values_eur.append(cryptocompare_response[coin_symbol]['EUR'])
     return {
-        'labels': dates,
-        'values_usd': values_usd,
-        'values_eur': values_eur
+        'labels': dates[::-1],
+        'values_usd': values_usd[::-1],
+        'values_eur': values_eur[::-1]
     }
