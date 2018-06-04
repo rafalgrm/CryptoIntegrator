@@ -61,9 +61,9 @@ def display_average_prices():
     return render_template('coins/average.html', result=get_average_prices())
 
 
-@app.route('/prices/history/monthly')
-def display_prices_history():
-    data = get_prices_history_monthly()
+@app.route('/prices/history/monthly/<coin_symbol>')
+def display_prices_history(coin_symbol):
+    data = get_prices_history_monthly(coin_symbol)
     return render_template('coins/history.html', values_usd=data['values_usd'], values_eur=data['values_eur'], labels=data['labels'])
 
 
