@@ -7,13 +7,11 @@ CRYPTONATOR_URL = 'https://api.cryptonator.com'
 
 
 def get_average_prices():
-    # https://api.coinmarketcap.com/
     cmc_prices = "{host}/v2/ticker/?limit=10&convert=EUR&structure=array".format(
         host=COIN_MARKET_CAP_URL)
     cmc_response = requests.get(cmc_prices).json()
     cmc_data = cmc_response['data']
     mapped_cmc_response = []
-    mapped_cryptonator_response = []
     requested_coins = []
     for data in cmc_data:
         requested_coins.append(data['symbol'].lower())
@@ -55,13 +53,4 @@ def get_average_prices():
             'average_usd': average_usd,
             'average_eur': average_eur
         })
-    # for coin in requested_coins:
-    #     base_cryptonator_url = "{host}/api/ticker/{coin}-{fiat}"
-    #     cryptonator_price_usd = base_cryptonator_url.format(host=CRYPTONATOR_URL, coin=coin, fiat='usd')
-    #     price_usd_response = requests.get(cryptonator_price_usd).json()
-    #     price_usd = price_usd_response['ticker']['price']
-    #     cryptonator_price_eur = base_cryptonator_url.format(host=CRYPTONATOR_URL, coin=coin, fiat='eur')
-    #     price_eur_response = requests.get(cryptonator_price_eur).json()
-    #     price_eur = price_eur_response['ticker']['price']
-
     return mapped_cmc_response
