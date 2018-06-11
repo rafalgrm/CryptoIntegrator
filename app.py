@@ -30,14 +30,9 @@ app.config.update({
     'SECRET_KEY': 'dev',
     'USERNAME': 'admin',
     'PASSWORD': 'admin',
-    'CONSUMER_KEY': os.environ['CONSUMER_KEY'],
-    'CONSUMER_SECRET': os.environ['CONSUMER_SECRET'],
+    'CONSUMER_KEY': os.environ.get('CONSUMER_KEY', None),
+    'CONSUMER_SECRET': os.environ.get('CONSUMER_SECRET', None)
 })
-
-print('#######')
-print(os.environ['CONSUMER_KEY'])
-print(os.environ['CONSUMER_SECRET'])
-print('#######')
 
 app.config.from_pyfile('config.py')
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
