@@ -29,18 +29,12 @@ app.config.update({
     'DATABASE': os.path.join(app.root_path, 'database.sqlite'),
     'SECRET_KEY': 'dev',
     'USERNAME': 'admin',
-    'PASSWORD': 'admin'
+    'PASSWORD': 'admin',
+    'CONSUMER_KEY': os.environ['CONSUMER_KEY'],
+    'CONSUMER_SECRET': os.environ['CONSUMER_SECRET'],
 })
 
 app.config.from_pyfile('config.py')
-
-if not app.config['CONSUMER_KEY']:
-    print('No consumer key in config. Getting from environment variables.')
-    app.config['CONSUMER_KEY'] = os.environ['CONSUMER_KEY']
-if not app.config['CONSUMER_SECRET']:
-    print('No consumer secret key in config. Getting from environment variables.')
-    app.config['CONSUMER_SECRET'] = os.environ['CONSUMER_SECRET']
-
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 # classifier
