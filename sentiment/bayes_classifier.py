@@ -35,11 +35,11 @@ class BayesClassifier:
         self.processor = TweetPreprocessor()
         self.all_words = set()
         self.all_words_count = []
+        self.to_classify_list = []
         self.load_all_words_doc(classifier_data_filename)
 
     def load_all_words_doc(self, classifier_filename):
         all_words_list = []
-        to_classify_list = []
         with open(classifier_filename, encoding="windows-1252", errors='ignore') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
@@ -47,7 +47,7 @@ class BayesClassifier:
                 all_words_list.extend(text)
                 self.all_words.update(text)
                 self.all_words_count.append(len(self.all_words))
-                to_classify_list.append((text, int(row[0])))
+                self.to_classify_list.append((text, int(row[0])))
         all_words_counts = Counter(all_words_list)
 
         # saving word frequencies file TODO move it to some Stats object for this classifier
@@ -55,19 +55,19 @@ class BayesClassifier:
         save_list('word_completness.txt', self.all_words_count)
 
         self.all_words.update([word for word in all_words_counts if all_words_counts[word]>WORD_THRESHOLD])
-        self.train_model(to_classify_list)
+        self.train_model()
 
-    def train_model(self, to_classify_list):
+    def train_model(self):
         train_items = []
         self.vectorizer = CountVectorizer()
-        X = self.vectorizer.fit_transform(list(map(lambda l: ' '.join(l[0]), to_classify_list)))
-        y = np.array(['pos' if row[1] == 4 or row[1] == 3 else 'neg' if row[1] == 1 or row[1] == 0 else 'neu' for row in to_classify_list])
+        X = self.vectorizer.fit_transform(list(map(lambda l: ' '.join(l[0]), self.to_classify_list)))
+        y = np.array(['pos' if row[1] == 4 or row[1] == 3 else 'neg' if row[1] == 1 or row[1] == 0 else 'neu' for row in self.to_classify_list])
         print(len(self.vectorizer.get_feature_names()))
         self.classifier = MultinomialNB().fit(X, y)
 
         # saving classifier for later testing
         f = open('niavebayes_classifier.pickle', 'wb')
-        pickle.dump(self.classifier, f)
+        pickle.dump(self.classifier, f, protocol=0)
         f.close()
 
     def predict(self, text):

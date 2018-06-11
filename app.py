@@ -1,20 +1,28 @@
 import csv
 import os
+import pickle
 import sqlite3
 
 from io import StringIO
 from flask import Flask, g, render_template, jsonify, make_response, request, redirect, url_for
 from flask_bootstrap import Bootstrap
+from werkzeug.contrib.cache import SimpleCache
 
+from forms import MainForm
+from sentiment.bayes_classifier import BayesClassifier
+from sentiment.tweet_preprocessor import TweetPreprocessor
 from tools.twitter_scrape import clean_tweet
 from twitter.get_tweets import get_tweets, search_tweets
 
 from coins.aggregate_prices import get_average_prices
 from coins.get_prices_history import get_prices_history_monthly
 
+import numpy as np
+
 app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(__name__)
+cache = SimpleCache()
 
 app.config.update({
     'DATABASE': os.path.join(app.root_path, 'database.sqlite'),
@@ -24,13 +32,36 @@ app.config.update({
 })
 
 app.config.from_pyfile('config.py')
+app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 
-@app.route('/')
-@app.route('/index')
+# classifier
+# clf = BayesClassifier('/home/rgrabianski/Pulpit/CryptoInt/CryptoIntegrator/classifier_data/training.1600000.processed.noemoticon_clean.csv')
+clf_file = open('classifier_final.pickle', 'rb')
+clf = pickle.load(clf_file)
+clf_file.close()
+
+TWEET_LIMIT = 20
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
-    result = get_tweets(app, 10)
-    return render_template('index.html', messages=result)
+    form = MainForm()
+
+    if request.method == 'POST':
+        result = cache.get('result')
+        if result is None:
+            result = get_tweets(app, TWEET_LIMIT)
+        if form.validate_on_submit():
+            name = request.form['crypto_name']
+            results, sentiment, avg_sentiment = get_coin_sentiment_data(name)
+            return render_template('index.html', messages=result, form=form, crypto_name=name,
+                                   sentiment={'result': enumerate(results), 'sentiment': sentiment, 'avg_sent': avg_sentiment})
+    else:
+        result = get_tweets(app, TWEET_LIMIT)
+        cache.set('result', result, 300)
+        return render_template('index.html', messages=result, form=form)
 
 
 @app.route('/tweets')
@@ -61,10 +92,34 @@ def display_average_prices():
     return render_template('coins/average.html', result=get_average_prices())
 
 
-@app.route('/prices/history/monthly/<coin_symbol>')
+@app.route('/prices/history/monthly/<coin_symbol>', methods=['GET', 'POST'])
 def display_prices_history(coin_symbol):
+    form = MainForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            name = request.form['crypto_name']
+            return redirect('/prices/history/monthly/'+name)
     data = get_prices_history_monthly(coin_symbol)
     return render_template('coins/history.html', values_usd=data['values_usd'], values_eur=data['values_eur'], labels=data['labels'])
+
+
+def get_coin_sentiment_data(coin_symbol):
+    preprocessor = TweetPreprocessor()
+    results = search_tweets(app, coin_symbol)
+    sentiment = []
+    for res in results:
+        text_c = clean_tweet(res['text'].replace('\n', '').replace('\r', ''))
+        text_clean = preprocessor.stem_tweet(preprocessor.tokenize_tweet(text_c))
+        sentiment.append(clf.predict(text_clean)[0])
+
+    avg_sentiment = sentiment.count('pos') / len(sentiment)
+    return results, sentiment, avg_sentiment
+
+
+@app.route('/sentiment/<coin_symbol>')
+def display_coin_sentiment(coin_symbol):
+    results, sentiment, avg_sentiment = get_coin_sentiment_data(coin_symbol)
+    return render_template('search_sentiment.html', sentiment={'result':enumerate(results), 'sentiment':sentiment, 'avg_sent':avg_sentiment})
 
 
 @app.route('/admin')

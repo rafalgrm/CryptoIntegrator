@@ -19,5 +19,5 @@ def clean_data(source_filename, target_filename):
                     count += 1
                 if count % 10000 == 0: print(count)
 
-clean_data('../classifier_data/training.1600000.processed.noemoticon.csv', '../classifier_data/training.1600000.processed.noemoticon_clean.csv')
-clean_data('../classifier_data/testdata.manual.2009.06.14.csv', '../classifier_data/testdata.manual.2009.06.14_clean.csv')
+clean_data('../app/classifier_data/training.1600000.processed.noemoticon.csv', '../classifier_data/training.1600000.processed.noemoticon_clean.csv')
+clean_data('../app/classifier_data/testdata.manual.2009.06.14.csv', '../classifier_data/testdata.manual.2009.06.14_clean.csv')

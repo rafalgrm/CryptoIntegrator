@@ -1,7 +1,3 @@
-from twitter.twitter_api_client import TwitterAPIClient
-from twitter.twitter_filter import TwitterFilter
-
-
 class TwitterStreamer:
 
     def __init__(self, twitter_api_client, filter, limit=100):
@@ -19,3 +15,4 @@ class TwitterStreamer:
         if self.count > self.limit:
             raise StopIteration
         return next(self.r)
+

@@ -1,0 +1,24 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Search results{% endblock %}
+
+{% block content %}
+<h1>Sentiment results for recent posts about <em>{{ query }}</em>: </h1>
+
+<h2>Average sentiment: </h2>
+{% if sentiment.avg_sent > 0.5 %}
+<p style="color:green;">POSITIVE in {{sentiment.avg_sent*100}}%</p>
+{% else %}
+<p style="color: red;">NEGATIVE in {{100.0-sentiment.avg_sent*100}}%</p>
+{% endif %}
+
+<ul class="list-group">
+{% for i, tweet in sentiment.result %}
+<li class="list-group-item">{{ tweet.text }}
+<small>{{ tweet.created_at }}</small>
+<br/>
+<strong>{% if sentiment.sentiment[i] == 'pos' %} <p style="color:green;"> POS </p> {% else %} <p style="color:red"> NEG </p>{% endif %}</strong>
+
+</li>`
+{% endfor %}
+</ul>
+{% endblock %}

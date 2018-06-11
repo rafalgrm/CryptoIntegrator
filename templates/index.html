@@ -16,10 +16,40 @@
 {% endblock %}
 
 {% block content %}
-<h1>Stub for main page of application</h1>
+<h1>Check cryptocurrency</h1>
     <div class="row" id="core-content">
     <div class="col-md-7">
-        COL MD 7
+        <div class="row">
+             <form method="post" action="/">
+            <div class="input-group">
+                {{ form.csrf_token }}
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Check sentiment</button>
+                </span>
+                {{ form.crypto_name(class_="form-control", placeholder="Cryptocurrency")}}
+            </div>
+        </form>
+        </div>
+        <div class="row">
+            <form method="post" action="/prices/history/monthly/">
+                <div class="input-group">
+
+                    {{ form.csrf_token }}
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Check chart</button>
+                    </span>
+                    {{ form.crypto_name(class_="form-control", placeholder="Cryptocurrency")}}
+                </div>
+            </form>
+        </div>
+
+
+        {% if crypto_name %}
+            {% include 'search_sentiment.html' %}
+        {% endif %}
+
+        <br/>
+
     </div>
     <div class="col-md-5">
         {% include 'twitter.html' %}
