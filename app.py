@@ -34,6 +34,11 @@ app.config.update({
     'CONSUMER_SECRET': os.environ['CONSUMER_SECRET'],
 })
 
+print('#######')
+print(os.environ['CONSUMER_KEY'])
+print(os.environ['CONSUMER_SECRET'])
+print('#######')
+
 app.config.from_pyfile('config.py')
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
