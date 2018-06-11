@@ -18,6 +18,7 @@ from coins.aggregate_prices import get_average_prices
 from coins.get_prices_history import get_prices_history_monthly
 
 import numpy as np
+import os
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -32,8 +33,15 @@ app.config.update({
 })
 
 app.config.from_pyfile('config.py')
-app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
+if not app.config['CONSUMER_KEY']:
+    print('No consumer key in config. Getting from environment variables.')
+    app.config['CONSUMER_KEY'] = os.environ['CONSUMER_KEY']
+if not app.config['CONSUMER_SECRET']:
+    print('No consumer secret key in config. Getting from environment variables.')
+    app.config['CONSUMER_SECRET'] = os.environ['CONSUMER_SECRET']
+
+app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 # classifier
 # clf = BayesClassifier('/home/rgrabianski/Pulpit/CryptoInt/CryptoIntegrator/classifier_data/training.1600000.processed.noemoticon_clean.csv')
