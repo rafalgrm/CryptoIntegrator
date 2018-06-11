@@ -31,11 +31,13 @@ app.config.update({
     'USERNAME': 'admin',
     'PASSWORD': 'admin',
     'CONSUMER_KEY': os.environ.get('CONSUMER_KEY', None),
-    'CONSUMER_SECRET': os.environ.get('CONSUMER_SECRET', None)
+    'CONSUMER_SECRET': os.environ.get('CONSUMER_SECRET', None),
+    'ACCESS_TOKEN_KEY': os.environ.get('ACCESS_TOKEN_KEY', None),
+    'ACCESS_TOKEN_SECRET': os.environ.get('ACCESS_TOKEN_SECRET', None)
 })
 
-app.config.from_pyfile('config.py')
-app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+# app.config.from_pyfile('config.py')
+# app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 # classifier
 # clf = BayesClassifier('/home/rgrabianski/Pulpit/CryptoInt/CryptoIntegrator/classifier_data/training.1600000.processed.noemoticon_clean.csv')
