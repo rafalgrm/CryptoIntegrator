@@ -38,3 +38,6 @@ virtualenv-clone==0.3.0
 visitor==0.1.3
 Werkzeug==0.14.1
 wrapt==1.10.11
+flask_wtf
+sklearn
+

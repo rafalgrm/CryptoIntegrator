@@ -1,0 +1,10 @@
+{% extends "bootstrap/base.html" %} 
+{% block title %}Average prices{% endblock %}
+{% block content %}
+
+<h1>Available historical coin prices</h1>
+{% for s in symbols %}
+<li class="list-group-item"><a href="/prices/history/monthly/{{s}}">{{ s }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

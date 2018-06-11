@@ -37,9 +37,9 @@ app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 # classifier
 # clf = BayesClassifier('/home/rgrabianski/Pulpit/CryptoInt/CryptoIntegrator/classifier_data/training.1600000.processed.noemoticon_clean.csv')
-clf_file = open('classifier_final.pickle', 'rb')
-clf = pickle.load(clf_file)
-clf_file.close()
+# clf_file = open('classifier_final.pickle', 'rb')
+# clf = pickle.load(clf_file)
+# clf_file.close()
 
 TWEET_LIMIT = 20
 
@@ -76,11 +76,12 @@ def search_endp(query):
 
 
 @app.route('/download/search/<query>')
-def download_search_endp(query): # TODO move to separate place, add header to CSV
+def download_search_endp(query):  # TODO move to separate place, add header to CSV
     result = search_tweets(app, query)
     io = StringIO()
     csv_writer = csv.writer(io)
-    csv_writer.writerows([[clean_tweet(tweet['text'].replace('\n', '').replace('\r', '')), tweet['created_at']] for tweet in result])
+    csv_writer.writerows([[clean_tweet(tweet['text'].replace('\n', '').replace(
+        '\r', '')), tweet['created_at']] for tweet in result])
     output = make_response(io.getvalue())
     output.headers['Content-Disposition'] = 'attachment; filename=tweets.csv'
     output.headers['Content-type'] = 'text/csv'
@@ -92,6 +93,15 @@ def display_average_prices():
     return render_template('coins/average.html', result=get_average_prices())
 
 
+@app.route('/prices/history/monthly')
+def display_available_history_charts():
+    average_prices = get_average_prices()
+    symbols = []
+    for val in average_prices:
+        symbols.append(val['symbol'])
+    return render_template('coins/history_list.html', symbols=symbols)
+
+
 @app.route('/prices/history/monthly/<coin_symbol>', methods=['GET', 'POST'])
 def display_prices_history(coin_symbol):
     form = MainForm()
@@ -100,7 +110,7 @@ def display_prices_history(coin_symbol):
             name = request.form['crypto_name']
             return redirect('/prices/history/monthly/'+name)
     data = get_prices_history_monthly(coin_symbol)
-    return render_template('coins/history.html', values_usd=data['values_usd'], values_eur=data['values_eur'], labels=data['labels'])
+    return render_template('coins/history.html', values_usd=data['values_usd'], values_eur=data['values_eur'], labels=data['labels'], symbol=coin_symbol)
 
 
 def get_coin_sentiment_data(coin_symbol):
@@ -109,7 +119,8 @@ def get_coin_sentiment_data(coin_symbol):
     sentiment = []
     for res in results:
         text_c = clean_tweet(res['text'].replace('\n', '').replace('\r', ''))
-        text_clean = preprocessor.stem_tweet(preprocessor.tokenize_tweet(text_c))
+        text_clean = preprocessor.stem_tweet(
+            preprocessor.tokenize_tweet(text_c))
         sentiment.append(clf.predict(text_clean)[0])
 
     avg_sentiment = sentiment.count('pos') / len(sentiment)
@@ -119,13 +130,14 @@ def get_coin_sentiment_data(coin_symbol):
 @app.route('/sentiment/<coin_symbol>')
 def display_coin_sentiment(coin_symbol):
     results, sentiment, avg_sentiment = get_coin_sentiment_data(coin_symbol)
-    return render_template('search_sentiment.html', sentiment={'result':enumerate(results), 'sentiment':sentiment, 'avg_sent':avg_sentiment})
+    return render_template('search_sentiment.html', sentiment={'result': enumerate(results), 'sentiment': sentiment, 'avg_sent': avg_sentiment})
 
 
 @app.route('/admin')
 def admin():
     db = get_db()
-    cur = db.execute('select name, abbreviation, enabled from cryptocurrencies join enabled on crypto_id=id order by id')
+    cur = db.execute(
+        'select name, abbreviation, enabled from cryptocurrencies join enabled on crypto_id=id order by id')
     assets = cur.fetchall()
     return render_template('admin.html', assets=assets)
 
@@ -133,9 +145,11 @@ def admin():
 @app.route('/save-admin')
 def save_admin():
     db = get_db()
-    cur = db.execute('select name, enabled, enabled_id from cryptocurrencies join enabled on crypto_id=id order by id')
+    cur = db.execute(
+        'select name, enabled, enabled_id from cryptocurrencies join enabled on crypto_id=id order by id')
     for c in cur:
-        db.execute('update enabled set enabled = {} where enabled_id = {}'.format(1 if request.args.get(c[0],) == 'true' else 0, c[2]))
+        db.execute('update enabled set enabled = {} where enabled_id = {}'.format(
+            1 if request.args.get(c[0],) == 'true' else 0, c[2]))
     db.commit()
     return redirect(url_for('admin'))
 

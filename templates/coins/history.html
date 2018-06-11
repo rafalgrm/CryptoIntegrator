@@ -1,7 +1,7 @@
 {% extends "bootstrap/base.html" %} 
 {% block title %}Prices history{% endblock %}
 {% block content %}
-<h1>Flask Chart.js</h1>
+<h1>Historical price, monthly. For: {{ symbol }}</h1>
 <canvas id="chart" width="600" height="400"></canvas>
 <script src='../../../static/Chart.min.js'></script>
 <script>
@@ -12,22 +12,24 @@
             datasets : [{
                 label: 'USD',
                 fill: false,
+                lineTension: 0,
                 backgroundColor: '#f44242',
                 borderColor: '#f44242',
                 data : [{% for item in values_usd %}{{item}},{% endfor %}]
             }, {
                 label: 'EUR',
                 fill: false,
+                lineTension: 0,
                 backgroundColor: '#424ef4',
                 borderColor: '#424ef4',
                 data : [{% for item in values_eur %}{{item}},{% endfor %}]
             }]
         },
         options: {
-            responsive: true,
+            responsive: false,
             title: {
                 display: true,
-                text: 'BTC prices in 2017'
+                text: '{{ symbol }} price'
             },
             tooltips: {
                 mode: 'index',
