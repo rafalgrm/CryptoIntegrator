@@ -32,7 +32,7 @@ requests-oauthlib==0.8.0
 scipy==0.19.0
 six==1.11.0
 TwitterAPI==2.5.0
-urllib3==1.22
+urllib3==1.26.5
 virtualenv==15.2.0
 virtualenv-clone==0.3.0
 visitor==0.1.3
